@@ -1,8 +1,10 @@
-import { Grid } from '@material-ui/core';
+import { Grid, InputAdornment, makeStyles, ButtonGroup, Button as MuiButton } from '@material-ui/core';
 import React, {useState} from 'react';
 import Form from '../../layouts/Form';
 import { Button, Select, Input } from '../../controls';
-
+import RestaurantMenuIcon from '@material-ui/icons/RestaurantMenu';
+import ReplayIcon from '@material-ui/icons/Replay';
+import ReorderIcon from '@material-ui/icons/Reorder';
 
 const pMethod = [
     {id: 'none', title: 'Select'},
@@ -10,21 +12,30 @@ const pMethod = [
     {id: 'Card', title: 'Card'},
 ]
 
-const generateOrderNumber = () => Math.floor(100000 + Math.random() * 900000).toString();
+const useStyles = makeStyles(theme => ({
+    adornmentText: {
+        '& .MuiTypography-root': {
+            color: '#f3b33d',
+            fontSize: '1.5em',
+            fontWeight: 'bolder'
+        }
+    },
+    submitButtonGroup: {
+        backgroundColor: '#f3b33d',
+        margin: theme.spacing(1),
+        color: '#000',
+        '& .MuiButton-label': {
+            textTransform: 'none'
+        },
+        '&:hover': {
+            backgroundColor: '#f3b33d',
+        }
+    }
+}))
 
-const getFreshModelObject = () => ({
-    orderMasterId : 0,
-    orderNumber: generateOrderNumber(),
-    customerId: 0,
-    pMethod: 'none',
-    gTotal: 0,
-    deletedOrderItemIds: '',
-    orderDetails: []
-})
-
-
-export default function OrderForm() {
-    const [values, setValues] = useState(getFreshModelObject());
+export default function OrderForm(props) {
+    const {values, errors, handleInputChange} = props;
+    const classes = useStyles();
 
     return (
        <Form>
@@ -35,6 +46,9 @@ export default function OrderForm() {
                         label='Order Number'
                         name='orderNumber'
                         value={values.orderNumber}
+                        InputProps={{
+                            startAdornment: <InputAdornment className={classes.adornmentText} position="start">#</InputAdornment>
+                        }}
                    />
                </Grid>
                <Grid item xs={6}>
@@ -42,6 +56,7 @@ export default function OrderForm() {
                         label='Payment Method'
                         name='pMethod'
                         options={pMethod}
+                        onChange={handleInputChange}
                         value={values.pMethod}
                    />
                </Grid>
@@ -51,6 +66,7 @@ export default function OrderForm() {
                     <Select 
                         label='Customer'
                         name='customerId'
+                        onChange={handleInputChange}
                         options={[
                             {id: 0, title: 'Select'},
                             {id: 1, title: 'Customer 1'},
@@ -67,7 +83,25 @@ export default function OrderForm() {
                        label='Grand Total'
                        name='gTotal' 
                        value={values.gTotal}
+                       InputProps={{
+                           startAdornment: <InputAdornment className={classes.adornmentText} position="start">$</InputAdornment>
+                       }}
                    />
+                   <ButtonGroup className={classes.submitButtonGroup}>
+                       <MuiButton
+                            size="large"
+                            type="submit"
+                            endIcon={<RestaurantMenuIcon/>}
+                       >Submit</MuiButton>
+                       <MuiButton 
+                            size="small"
+                            startIcon={<ReplayIcon/>}
+                       />
+                   </ButtonGroup>
+                   <Button
+                        size="large"
+                        startIcon={<ReorderIcon/>}
+                   >Orders</Button>
                </Grid>
            </Grid>
        </Form>

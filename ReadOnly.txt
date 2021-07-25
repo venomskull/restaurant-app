@@ -3,3 +3,4 @@ react vs code
 npx create-react-app restaurant-app
 npm install @material-ui/core
 npm install @material-ui/icons
+npm i axios
