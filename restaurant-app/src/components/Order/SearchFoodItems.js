@@ -37,7 +37,8 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function SearchFoodItems(props) {
-    const {addFoodItem} = props;
+    const {values, setValues} = props;
+    let orderedFoodItem = values.orderDetails;
     const [foodItems, setFoodItems] = useState([]);
     const [searchList, setSearchList] = useState([]);
     const [searchKey, setSearchKey] = useState('');
@@ -56,9 +57,25 @@ export default function SearchFoodItems(props) {
         let x = [...foodItems];
         x = x.filter(y => {
             return y.foodItemName.toLowerCase().includes(searchKey.toLocaleLowerCase())
+            && orderedFoodItem.every(item => item.foodItemId != y.foodItemId)
         })
         setSearchList(x);
-    }, [searchKey])
+    }, [searchKey, orderedFoodItem])
+
+    const addFoodItem = (foodItem) => {
+        let x = {
+            orderDetailId: 0,
+            orderMasterId: values.orderMasterId,
+            foodItemId: foodItem.foodItemId,
+            foodItemPrice: foodItem.price,
+            quantity: 1,
+            foodItemName: foodItem.foodItemName
+        };
+        setValues({
+            ...values,
+            orderDetails: [...values.orderDetails, x] //append or push to existing array
+        });
+    }
 
     return (
         <>
@@ -75,7 +92,10 @@ export default function SearchFoodItems(props) {
             </Paper>
             <List className={classes.listRoot}>
                 {searchList.map((item, index) => (
-                    <ListItem key={index}>
+                    <ListItem 
+                        key={index}
+                        onClick={(e) => addFoodItem(item)}
+                    >
                         <ListItemText 
                             primary={item.foodItemName} 
                             secondary={'$' + item.price}
