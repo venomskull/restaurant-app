@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function OrderForm(props) {
-    const {values, setValues, errors, handleInputChange} = props;
+    const {values, setValues, errors, setErrors, handleInputChange, resetFormControls} = props;
     const classes = useStyles();
     const [customerList, setCustomerList] = useState([]);
 
@@ -63,8 +63,29 @@ export default function OrderForm(props) {
         })
     }, [JSON.stringify(values.orderDetails)])
 
+    const validateForm = () => {
+        let temp = {};
+        temp.customerId = values.customerId != 0 ? "" : "This field is required";
+        temp.pMethod = values.pMethod != "none" ? "" : "This field is required";
+        temp.orderDetails = values.orderDetails.length != 0 ? "" : "This field is required";
+        setErrors({...temp});  
+        return Object.values(temp).every(x => x === "");
+    }
+
+    const submitOrder = (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            createAPIEndPoint(ENDPOINTS.ORDER).create(values)
+            .then(res => {
+                // console.log(res);
+                resetFormControls();
+            })
+            .catch(err => console.log(err));
+        }
+    }
+
     return (
-       <Form>
+       <Form onSubmit={submitOrder} >
            <Grid container>
                <Grid item xs={6}>
                    <Input 
@@ -84,6 +105,7 @@ export default function OrderForm(props) {
                         options={pMethod}
                         onChange={handleInputChange}
                         value={values.pMethod}
+                        error={errors.pMethod}
                    />
                </Grid>
            </Grid>
@@ -95,6 +117,7 @@ export default function OrderForm(props) {
                         onChange={handleInputChange}
                         options={customerList}
                         value={values.customerId}
+                        error={errors.customerId}
                    />
                </Grid>
                <Grid item xs={6}>
